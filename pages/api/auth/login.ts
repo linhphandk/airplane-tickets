@@ -6,7 +6,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   try {
-    const { email, password } = req.body;
+    const { email, password } = JSON.parse(req.body);
     const exits = (await login(email, password)) ?? false;
     if (exits) {
       res.status(200).json({ success: true });
@@ -14,6 +14,6 @@ export default async function handler(
       res.status(422).json({ success: false });
     }
   } catch (_) {
-      res.status(500).json({ error: "Something went wrong." });
+    res.status(500).json({ error: "Something went wrong." });
   }
 }

@@ -22,16 +22,16 @@ const formSchema = z.object({
   email: z.string().email().default(""),
   password: z.string().min(5),
 });
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<null | string>(null);
   const onSubmit = async (data: ILoginForm) => {
-    const res = await fetch("/api/auth/login", {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
-    if (res.status === 404) {
-      setSubmitError("Wrong username or password");
+    if (res.status === 422) {
+      setSubmitError("Username already taken");
       return;
     }
     if (res.status === 200) {
@@ -82,11 +82,11 @@ export default function LoginPage() {
           />
           {submitError && <p>{submitError}</p>}
           <Button className="w-full mt-1/2" type="submit">
-            Sign in
+            Register
           </Button>
         </form>
       </Form>
-      <Link href="/register">register</Link>
+      <Link href="/">Already have an account?</Link>
     </div>
   );
 }
