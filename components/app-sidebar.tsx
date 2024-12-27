@@ -13,8 +13,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { UserContext } from "@/app/context";
-import { useLocalStorage } from "@uidotdev/usehooks";
-import { User } from "@/app/register/localstorage";
 
 // This is sample data.
 const data = {

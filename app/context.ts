@@ -4,6 +4,7 @@ export interface IUser {
   id: string;
   email: string;
 }
+
 interface IUserContext {
   user: IUser | null;
   setUser: Dispatch<SetStateAction<IUser | null>>;
