@@ -9,8 +9,13 @@ export default async function handler(
   try {
     const { email, password } = JSON.parse(req.body);
     const result = await register(email, password);
-    if (result === DBError.DUPLICATE_KEY)
+    if (result === DBError.DUPLICATE_KEY) {
       res.status(422).json({ success: false, message: "DUPLICATE_KEY" });
+    } else {
+      res
+        .status(200)
+        .json({ success: true, payload: { id: result, email: email } });
+    }
   } catch (_) {
     res.status(500).json({ error: "Something went wrong." });
   }

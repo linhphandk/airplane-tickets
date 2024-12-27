@@ -19,8 +19,10 @@ class UserDB {
   `;
 
     return client
-      .query(query, [user.username, hashPassword(user.password)])
-      .then((inserted) => inserted.oid)
+      .query(query, [user.email, hashPassword(user.password)])
+      .then((inserted) => 
+        inserted.rows.at(0).uid
+      )
       .catch((error) => {
         if (error.code === DBError.DUPLICATE_KEY) {
           return DBError.DUPLICATE_KEY;
@@ -29,27 +31,29 @@ class UserDB {
       });
   }
 
-  public async userExists(user: User): Promise<boolean> {
+  public async getUserId(user: User): Promise<number | null> {
     const query = `
-    SELECT password
-    FROM users 
+    SELECT uid, password
+    FROM users
     WHERE email = $1;
   `;
 
     const client = getDBClient();
     client.connect();
-
-    const queryResult = await client.query(query, [user.username]);
+    const queryResult = await client.query(query, [user.email]);
 
     if (queryResult === null || queryResult.rowCount === 0) {
-      return false;
+      return null;
     }
     const hashedPassword = queryResult.rows.at(0)?.password;
 
     if (hashedPassword === undefined) {
-      return false;
+      return null;
     }
-    return comparePassword(user.password, hashedPassword);
+    if (await comparePassword(user.password, hashedPassword)) {
+      return queryResult.rows.at(0)?.uid??null;
+    }
+    return null;
   }
 }
 export default UserDB;

@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import { User } from "./localstorage";
 interface ILoginForm {
   email: string;
 }
@@ -25,18 +27,22 @@ const formSchema = z.object({
 export default function RegisterPage() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<null | string>(null);
+  const [_, setUserLs] = useLocalStorage<User | null>("user", null);
+
   const onSubmit = async (data: ILoginForm) => {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
     if (res.status === 422) {
-      setSubmitError("Username already taken");
+      setSubmitError("Username or password not correct");
       return;
     }
     if (res.status === 200) {
       setSubmitError(null);
-      router.push("/home");
+      const payload = (await res.json()).payload;
+      setUserLs({ id: payload.id, email: payload.email });
+      router.push("/dashboard");
       return;
     } else {
       setSubmitError("Something went wrong...");

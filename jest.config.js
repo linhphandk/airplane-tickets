@@ -4,4 +4,7 @@ module.exports = {
   transform: {
     "^.+.tsx?$": ["ts-jest", {}],
   },
+  moduleNameMapper: {
+    "@/app/(.*)": "<rootDir>/app/$1",
+  },
 };

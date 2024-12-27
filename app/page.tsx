@@ -12,9 +12,10 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { UserContext } from "./context";
 interface ILoginForm {
   email: string;
 }
@@ -25,6 +26,7 @@ const formSchema = z.object({
 export default function LoginPage() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<null | string>(null);
+  const userContext = useContext(UserContext);
   const onSubmit = async (data: ILoginForm) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
@@ -34,9 +36,12 @@ export default function LoginPage() {
       setSubmitError("Wrong username or password");
       return;
     }
+
     if (res.status === 200) {
       setSubmitError(null);
-      router.push("/home");
+      const payload = (await res.json()).payload;
+      userContext?.setUser({ id: payload.id, email: payload.email });
+      router.push("/dashboard");
       return;
     } else {
       setSubmitError("Something went wrong...");

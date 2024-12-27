@@ -7,11 +7,13 @@ export default async function handler(
 ) {
   try {
     const { email, password } = JSON.parse(req.body);
-    const exits = (await login(email, password)) ?? false;
-    if (exits) {
-      res.status(200).json({ success: true });
+    const userId = await login(email, password);
+    if (userId !== null) {
+      res
+        .status(200)
+        .json({ success: true, payload: { id: userId, email: email } });
     } else {
-      res.status(422).json({ success: false });
+      res.status(404).json({ success: false });
     }
   } catch (_) {
     res.status(500).json({ error: "Something went wrong." });
