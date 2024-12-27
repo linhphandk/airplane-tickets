@@ -11,12 +11,12 @@ export function Providers({ children }) {
   const [user, setUser] = useState<IUser | null>(userLs);
   const router = useRouter();
   useEffect(() => {
-    console.log(user);
     setUserLs(user);
-    if (user === null) {
+    const path = window.location.pathname;
+    if (user === null && !(path == "/" || path == "/register")) {
       router.push("/");
     }
-  }, [user, setUserLs]);
+  }, [user]);
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}

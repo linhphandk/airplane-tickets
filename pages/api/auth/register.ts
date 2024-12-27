@@ -17,6 +17,7 @@ export default async function handler(
         .json({ success: true, payload: { id: result, email: email } });
     }
   } catch (_) {
+    console.log(_);
     res.status(500).json({ error: "Something went wrong." });
   }
 }

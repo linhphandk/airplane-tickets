@@ -12,11 +12,12 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { User } from "./localstorage";
+import { User, USER_LOCALSTORAGE_NAME } from "./localstorage";
+import { UserContext } from "../context";
 interface ILoginForm {
   email: string;
 }
@@ -26,8 +27,12 @@ const formSchema = z.object({
 });
 export default function RegisterPage() {
   const router = useRouter();
+  const userContext = useContext(UserContext);
   const [submitError, setSubmitError] = useState<null | string>(null);
-  const [_, setUserLs] = useLocalStorage<User | null>("user", null);
+  const [_, setUserLs] = useLocalStorage<User | null>(
+    USER_LOCALSTORAGE_NAME,
+    null,
+  );
 
   const onSubmit = async (data: ILoginForm) => {
     const res = await fetch("/api/auth/register", {
@@ -41,6 +46,8 @@ export default function RegisterPage() {
     if (res.status === 200) {
       setSubmitError(null);
       const payload = (await res.json()).payload;
+      userContext?.setUser({ id: payload.id, email: payload.email });
+
       setUserLs({ id: payload.id, email: payload.email });
       router.push("/dashboard");
       return;
@@ -67,7 +74,7 @@ export default function RegisterPage() {
               <FormItem>
                 <FormLabel>Username</FormLabel>
                 <FormControl>
-                  <Input placeholder="Email" {...field} />
+                  <Input data-testid="email" placeholder="Email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -80,14 +87,23 @@ export default function RegisterPage() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input placeholder="Password" type="password" {...field} />
+                  <Input
+                    data-testid="password"
+                    placeholder="Password"
+                    type="password"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
           {submitError && <p>{submitError}</p>}
-          <Button className="w-full mt-1/2" type="submit">
+          <Button
+            data-testid="register"
+            className="w-full mt-1/2"
+            type="submit"
+          >
             Register
           </Button>
         </form>

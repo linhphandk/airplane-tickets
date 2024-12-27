@@ -20,9 +20,7 @@ class UserDB {
 
     return client
       .query(query, [user.email, hashPassword(user.password)])
-      .then((inserted) => 
-        inserted.rows.at(0).uid
-      )
+      .then((inserted) => inserted.rows.at(0).uid)
       .catch((error) => {
         if (error.code === DBError.DUPLICATE_KEY) {
           return DBError.DUPLICATE_KEY;
@@ -51,7 +49,7 @@ class UserDB {
       return null;
     }
     if (await comparePassword(user.password, hashedPassword)) {
-      return queryResult.rows.at(0)?.uid??null;
+      return queryResult.rows.at(0)?.uid ?? null;
     }
     return null;
   }
